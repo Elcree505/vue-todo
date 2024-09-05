@@ -28,7 +28,7 @@
                 :key="todo.id"
                 :todo="todo"
                 @finish="$emit('finish', $event)"
-                @edit="$emit('edit', $event)"
+                @edit="onEdit"
                 @delete="$emit('delete', $event)"
               />
             </v-list>
@@ -51,7 +51,7 @@
                 :key="todo.id"
                 :todo="todo"
                 @undo="$emit('undo', $event)"
-                @edit="$emit('edit', $event)"
+                @edit="onEdit"
                 @delete="$emit('delete', $event)"
               />
             </v-list>
@@ -62,32 +62,35 @@
         </v-card>
       </v-col>
     </v-row>
-
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, PropType, computed } from 'vue';
-import { Todo } from '@/types/types';
+<script lang="ts" setup>
+import { computed, defineEmits, defineProps } from 'vue';
+import type { PropType } from 'vue';
+import type { Todo } from '@/types/types';
 import TodoItem from './TodoItem.vue';
 
-export default defineComponent({
-  components: { TodoItem },
-  props: {
-    todos: {
-      type: Array as PropType<Todo[]>,
-      required: true,
-    },
-  },
-  emits: ['finish', 'undo', 'edit', 'delete'],
-  setup(props) {
-    const unfinishedTodos = computed(() => props.todos.filter(todo => !todo.finished));
-    const finishedTodos = computed(() => props.todos.filter(todo => todo.finished));
+declare module '@vue/runtime-core' {
+  export interface GlobalComponents {
+    ComponentName: typeof TodoItem
+  }
+}
 
-    return {
-      unfinishedTodos,
-      finishedTodos,
-    };
+const props = defineProps({
+  todos: {
+    type: Array as PropType<Todo[]>,
+    required: true,
   },
 });
+
+const emit = defineEmits(['finish', 'undo', 'edit', 'delete']);
+
+const unfinishedTodos = computed(() => props.todos.filter(todo => !todo.finished));
+const finishedTodos = computed(() => props.todos.filter(todo => todo.finished));
+
+const onEdit = (todo: Todo, newTitle: string) => {
+  console.log('TodoList emitting edit:', todo, newTitle);
+  emit('edit', todo, newTitle);
+};
 </script>

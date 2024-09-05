@@ -42,51 +42,55 @@
   </v-list-item>
 </template>
 
-<script lang="ts">
-import { defineComponent, PropType, ref, watch } from 'vue';
-import { Todo } from '@/types/types';
+<script lang="ts" setup>
+import { ref, watch, defineEmits, defineProps } from 'vue';
+import type { PropType } from 'vue';
+import type { Todo } from '@/types/types';
 
-export default defineComponent({
-  props: {
-    todo: {
-      type: Object as PropType<Todo>,
-      required: true,
-    },
-  },
-  emits: ['finish', 'undo', 'edit', 'delete'],
-  setup(props, { emit }) {
-    const editDialog = ref(false);
-    const editedTitle = ref(props.todo.title);
-
-    watch(() => props.todo, (newTodo) => {
-      console.log('Todo updated:', newTodo);
-      editedTitle.value = newTodo.title;
-    }, { deep: true });
-
-    const formatDate = (date: Date) => {
-      return new Date(date).toLocaleString();
-    };
-
-    const startEdit = () => {
-      editedTitle.value = props.todo.title;
-      editDialog.value = true;
-    };
-
-    const saveEdit = () => {
-      console.log('Saving edit:', editedTitle.value);
-      if (editedTitle.value.trim() !== props.todo.title) {
-        emit('edit', props.todo, editedTitle.value.trim());
-      }
-      editDialog.value = false;
-    };
-
-    return {
-      editDialog,
-      editedTitle,
-      formatDate,
-      startEdit,
-      saveEdit,
-    };
+const props = defineProps({
+  todo: {
+    type: Object as PropType<Todo>,
+    required: true,
   },
 });
+
+const emit = defineEmits(['finish', 'undo', 'edit', 'delete']);
+
+const editDialog = ref(false);
+const editedTitle = ref(props.todo.title);
+
+watch(() => props.todo, (newTodo) => {
+  console.log('Todo updated:', newTodo);
+  editedTitle.value = newTodo.title;
+}, { deep: true });
+
+const formatDate = (date: Date) => {
+  return new Date(date).toLocaleString();
+};
+
+const startEdit = () => {
+  editedTitle.value = props.todo.title;
+  editDialog.value = true;
+};
+
+const saveEdit = () => {
+  console.log('Saving edit:', editedTitle.value);
+  if (!props.todo || typeof props.todo.title === 'undefined') {
+    console.error('Invalid todo item in TodoItem');
+    editDialog.value = false;
+    return;
+  }
+
+  const trimmedTitle = editedTitle.value.trim();
+  if (trimmedTitle && trimmedTitle !== props.todo.title) {
+    console.log('Emitting edit event', props.todo, trimmedTitle);
+    emit('edit', props.todo, trimmedTitle);
+  } else if (!trimmedTitle) {
+    console.warn('Cannot save empty title');
+  }
+
+  console.log(editedTitle.value);
+
+  editDialog.value = false;
+};
 </script>

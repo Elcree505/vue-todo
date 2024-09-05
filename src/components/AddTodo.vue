@@ -11,25 +11,17 @@
   </v-form>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref } from 'vue';
+<script lang="ts" setup>
+import { ref, defineEmits } from 'vue';
 
-export default defineComponent({
-  emits: ['add-todo'],
-  setup(props, { emit }) {
-    const newTodo = ref('');
+const emit = defineEmits(['add-todo']);
 
-    const addTodo = () => {
-      if (newTodo.value.trim()) {
-        emit('add-todo', newTodo.value.trim());
-        newTodo.value = '';
-      }
-    };
+const newTodo = ref('');
 
-    return {
-      newTodo,
-      addTodo,
-    };
-  },
-});
+const addTodo = () => {
+  if (newTodo.value.trim()) {
+    emit('add-todo', newTodo.value.trim());
+    newTodo.value = '';
+  }
+};
 </script>
