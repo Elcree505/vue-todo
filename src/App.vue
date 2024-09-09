@@ -109,23 +109,13 @@ const undoTodo = (todo: Todo) => {
 };
 
 const editTodo = (todo: Todo, newTitle: string | undefined) => {
-  if (!todo || typeof todo.title !== 'string') {
-    console.error('Invalid todo item', todo);
-    showErrorMessage('Invalid todo item');
-    return;
-  }
-
   if (typeof newTitle === 'undefined') {
     console.error('New title is undefined or null', newTitle);
-    showErrorMessage('Invalid new title');
+    showErrorMessage('Todo title cannot be empty');
     return;
   }
 
   const trimmedNewTitle = newTitle.trim();
-  if (!trimmedNewTitle) {
-    showErrorMessage('Todo title cannot be empty');
-    return;
-  }
 
   if (todo.title.toLowerCase() !== trimmedNewTitle.toLowerCase() && isTodoExist(trimmedNewTitle)) {
     showErrorMessage('This todo already exists!');

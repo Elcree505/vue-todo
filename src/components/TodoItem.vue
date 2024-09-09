@@ -86,6 +86,7 @@ const saveEdit = () => {
     console.log('Emitting edit event', props.todo, trimmedTitle);
     emit('edit', props.todo, trimmedTitle);
   } else if (!trimmedTitle) {
+    emit('edit', trimmedTitle);
     console.warn('Cannot save empty title');
   }
 
